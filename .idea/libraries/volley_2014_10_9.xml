@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="volley-2014.10.9">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/me.neavo/volley/2014.10.9/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/me.neavo/volley/2014.10.9/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
