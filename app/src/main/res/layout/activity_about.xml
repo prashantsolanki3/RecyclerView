@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.quasar_academy.twowayview.extras.About">
+
+    <ImageView
+    android:layout_width="250dp"
+    android:layout_height="250dp"
+    android:padding="25dp"
+    android:src="@drawable/logo"/>
+
+    <TextView
+        android:text="Check Out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:text="quasar-academy.com"
+        android:layout_width="wrap_content"
+        android:clickable="true"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:autoLink="web"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:text="and"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:text="quasar-productions.com"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_width="wrap_content"
+        android:clickable="true"
+        android:autoLink="web"
+        android:layout_height="wrap_content" />
+    <FrameLayout
+        android:id="@+id/ad_container"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="match_parent"
+        tools:context=".MyActivity"
+        tools:ignore="MergeRootFrame" />
+    </LinearLayout>

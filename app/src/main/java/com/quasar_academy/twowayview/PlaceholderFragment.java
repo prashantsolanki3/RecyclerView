@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -41,8 +42,9 @@ import java.util.Locale;
 public class PlaceholderFragment extends Fragment {
 
     LayoutAdapter adapter;
-    ArrayList<Product> arraylist = new ArrayList<Product>();
+    ArrayList<Post> arraylist = new ArrayList<Post>();
     EditText editsearch;
+    SwipeRefreshLayout swipeRefreshLayout;
     private TwoWayView mRecyclerView;
     private Toast mToast;
     private int mLayoutId = R.layout.fragment_my;
@@ -50,7 +52,6 @@ public class PlaceholderFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
 
@@ -66,7 +67,15 @@ public class PlaceholderFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final Activity activity = getActivity();
-
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe);
+        swipeRefreshLayout.measure(500,500);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Toast.makeText(getActivity(),"Refreshing",Toast.LENGTH_LONG).show();
+               // swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         mToast = Toast.makeText(activity, "", Toast.LENGTH_SHORT);
         mToast.setGravity(Gravity.CENTER, 0, 0);
 
@@ -105,8 +114,8 @@ public class PlaceholderFragment extends Fragment {
         itemClick.setOnItemLongClickListener(new ItemClickSupport.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(RecyclerView parent, View child, int position, long id) {
-                LayoutAdapter.SimpleViewHolder childViewHolder = (LayoutAdapter.SimpleViewHolder) parent.getChildViewHolder(child);
-                mToast.setText("Long Clicked " + childViewHolder.product.getDescription());
+                LayoutAdapter.CategoryViewHolder childViewHolder = (LayoutAdapter.CategoryViewHolder) parent.getChildViewHolder(child);
+                mToast.setText("Long Clicked " + childViewHolder.post.getTitle());
                 mToast.show();
                 return true;
             }
@@ -116,37 +125,58 @@ public class PlaceholderFragment extends Fragment {
         itemClick.setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClick(RecyclerView parent, View child, int position, long id) {
-                LayoutAdapter.SimpleViewHolder childViewHolder = (LayoutAdapter.SimpleViewHolder) parent.getChildViewHolder(child);
-                mToast.setText("Clicked " + childViewHolder.product.getTitle());
+                LayoutAdapter.CategoryViewHolder childViewHolder = (LayoutAdapter.CategoryViewHolder) parent.getChildViewHolder(child);
+                mToast.setText("Clicked " + childViewHolder.post.getUrl());
                 mToast.show();
             }
 
         });
 
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
 
             }
 
 
+            boolean loading = true;
+            int pastVisiblesItems, visibleItemCount, totalItemCount;
+
             @Override
             public void onScrolled(RecyclerView recyclerView, int i, int i2) {
-                if (!(mRecyclerView.getFirstVisiblePosition() == 0 || mRecyclerView.getFirstVisiblePosition() > 0))
-                    mRecyclerView.scrollToPosition(0);
+                /**
+                 * Makes SwipeRefreshLayout Work in  RecyclerView
+                 */
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                swipeRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
 
 
+                visibleItemCount = recyclerView.getChildCount();
+                totalItemCount = recyclerView.getLayoutManager().getItemCount();
+                pastVisiblesItems = recyclerView.getChildAt(0).getTop();
+
+                if (loading) {
+                    if ( (visibleItemCount+pastVisiblesItems) >= totalItemCount) {
+                        loading = false;
+                        Log.d("...", "Last Item Wow !");
+                    }
+                }else{
+                    loading =true;
+                    Log.d("...", "Loading");
+                }
             }
         });
         final Drawable divider = getResources().getDrawable(R.drawable.divider);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(divider));
+
         loadData();
 
     }
 
     public void loadData() {
         JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                "http://quasar-academy.com/tutorial-server/recycler_json.php", null, new Response.Listener<JSONObject>() {
+                "https://prashantsolanki3.github.io/tut-jsons/recycler_data.json", null, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
@@ -190,14 +220,14 @@ public class PlaceholderFragment extends Fragment {
             for (int i = 0; i < feedArray.length(); i++) {
                 JSONObject feedObj = (JSONObject) feedArray.get(i);
 
-                Product item = new Product();
+                Post item = new Post();
                 item.setId(feedObj.getInt("id"));
                 item.setTitle(feedObj.getString("title"));
-                item.setDescription(feedObj.getString("description"));
-                item.setFeatured_src(feedObj.getString(("featured_src")));
+                item.setSlug(feedObj.getString("description"));
+                item.setContent(feedObj.getString(("featured_src")));
 
                 arraylist.add(item);
-                Log.d("LOAD DATA", item.getId() + " " + item.getTitle() + " " + item.getDescription());
+                Log.d("LOAD DATA", item.getId() + " " + item.getTitle());
             }
             adapter = new LayoutAdapter(getActivity(), mRecyclerView, mLayoutId, arraylist);
             mRecyclerView.setAdapter(adapter);

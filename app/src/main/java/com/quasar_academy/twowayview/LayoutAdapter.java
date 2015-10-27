@@ -20,32 +20,33 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.SimpleViewHolder> {
+public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.CategoryViewHolder> {
 
     private final Context mContext;
     private final TwoWayView mRecyclerView;
     private final int mLayoutId;
-    private ArrayList<Product> arraylist;
-    private List<Product> productlist = null;
+    private ArrayList<Post> arraylist;
+    private List<Post> postlist = null;
 
-    public LayoutAdapter(Context context, TwoWayView recyclerView, int layoutId, List<Product> productlist) {
+    public LayoutAdapter(Context context, TwoWayView recyclerView, int layoutId, List<Post> postlist) {
         mContext = context;
-        this.productlist = productlist;
+        this.postlist = postlist;
         mRecyclerView = recyclerView;
         mLayoutId = layoutId;
-        this.arraylist = new ArrayList<Product>();
-        this.arraylist.addAll(productlist);
+        this.arraylist = new ArrayList<Post>();
+        this.arraylist.addAll(postlist);
     }
+
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        productlist.clear();
+        postlist.clear();
         if (charText.length() == 0) {
-            productlist.addAll(arraylist);
+            postlist.addAll(arraylist);
         } else {
-            for (Product wp : arraylist) {
-                if (wp.getTitle().toLowerCase(Locale.getDefault()).contains(charText) || wp.getDescription().toLowerCase(Locale.getDefault()).contains(charText)) {
-                    productlist.add(wp);
+            for (Post wp : arraylist) {
+                if (wp.getTitle().toLowerCase(Locale.getDefault()).contains(charText) || wp.getContent().toLowerCase(Locale.getDefault()).contains(charText)) {
+                    postlist.add(wp);
                 }
             }
         }
@@ -53,15 +54,15 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.SimpleView
     }
 
     @Override
-    public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(mContext).inflate(R.layout.item, parent, false);
-        return new SimpleViewHolder(view);
+        return new CategoryViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(SimpleViewHolder holder, int position) {
+    public void onBindViewHolder(CategoryViewHolder holder, int position) {
 
-        holder.setData(mContext, productlist.get(position));
+        holder.setData(mContext, postlist.get(position));
 
         boolean isVertical = (mRecyclerView.getOrientation() == TwoWayLayoutManager.Orientation.VERTICAL);
 
@@ -92,27 +93,28 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.SimpleView
 
     @Override
     public int getItemCount() {
-        return productlist.size();
+        return postlist.size();
     }
 
-    public static class SimpleViewHolder extends RecyclerView.ViewHolder {
+    public static class CategoryViewHolder extends RecyclerView.ViewHolder {
         public final TextView title;
         public final ImageView featured_src;
-        public Product product;
+        public Post post;
 
-        public SimpleViewHolder(View view) {
+        public CategoryViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.title);
             featured_src = (ImageView) view.findViewById(R.id.featured_src);
 
         }
 
-        public void setData(Context mContext, Product product) {
-            this.product = product;
+        public void setData(Context mContext, Post post) {
+
+            this.post = post;
             if (title != null)
-                title.setText(product.getTitle().toString());
-            if (featured_src != null)
-                Picasso.with(mContext).load(product.getFeatured_src()).into(featured_src);
+                title.setText(post.getTitle().toString());
+            /*if (featured_src != null)
+                Picasso.with(mContext).load(post.getFeatured_src()).into(featured_src);*/
 
         }
     }
